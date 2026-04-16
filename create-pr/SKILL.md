@@ -1,136 +1,46 @@
 ---
 
 name: create-pr
-description: Analyze repository changes, discover available scripts (lint, test, build), validate if possible, then commit, push and open a PR. Use when the user wants to safely publish code.
------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+description: Prepare and publish changes by analyzing git diff, discovering available project scripts, running validations when available, updating changelog, versioning, committing and opening a PR.
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-# Create PR
+# Prepare Application for Commit
 
-## Quick Start
+Steps:
 
-Understand changes → discover available validations → run what exists → commit → push → open PR.
+1. Analyze all uncommitted git changes
 
----
+2. Update `CHANGELOG.md` documenting the changes (if the file exists)
 
-## When to Use
+3. Detect project package manager and scripts:
 
-Use when the user asks to:
+   * identify if the project uses pnpm, yarn, npm or bun
+   * read `package.json` scripts (if available)
 
-* commit changes
-* open a PR
-* publish code
-* validate before committing
+4. Run lint (if available):
 
----
+   * find a script related to lint (e.g. lint, lint:fix, check)
+   * execute it using the correct package manager
+   * if no lint script exists → skip
 
-## Execution Rules
+5. Run tests (if available):
 
-* Always discover available tools before executing anything
-* Never assume scripts or commands
-* Only run what actually exists
-* Missing scripts are NOT errors
-* Stop only on real execution failures
-* Prefer incremental execution if the environment is unstable
+   * find a test script (e.g. test, test:ci, test:unit)
+   * execute it
+   * if no test script exists → skip
 
----
+6. Run build (if available):
 
-## Workflow
+   * find a build-related script (e.g. build, compile, typecheck)
+   * execute it
+   * if no build script exists → skip
 
-### 1. Inspect Changes
+7. Increment project version using semantic versioning (if applicable)
 
-* Analyze current git state
-* Identify all modified, added and deleted files
-* Understand the scope before acting
+8. Stage all changes
 
----
+9. Create a conventional commit summarizing the changes
 
-### 2. Discover Project Capabilities
+10. Push the current branch to remote
 
-If `package.json` exists:
-
-* Read `scripts`
-* Detect if there are scripts related to:
-
-  * lint (e.g. lint, lint:fix, check)
-  * tests (e.g. test, test:ci, test:unit)
-  * build (e.g. build, compile, typecheck)
-
-If no `package.json`:
-
-* Try to infer tooling from project structure (Makefile, language, etc.)
-
----
-
-### 3. Run Available Validations
-
-* If lint script exists → run it
-* If test script exists → run it
-* If build script exists → run it
-
-Rules:
-
-* Execute only what was discovered
-* Skip silently if not available
-* Stop on real failures
-* Never fail due to missing scripts
-
----
-
-### 4. Update Changelog (if present)
-
-* Detect if `CHANGELOG.md` exists
-* If yes, add a concise entry describing the change
-
----
-
-### 5. Versioning (if applicable)
-
-* If project uses versioning (e.g. `package.json`):
-
-  * determine correct semver bump (patch, minor, major)
-* If uncertain → ask before applying
-
----
-
-### 6. Commit
-
-* Stage all changes
-* Generate a conventional commit message based on actual changes
-
-Format:
-
-```id="x8k1qz"
-type(scope): summary
-```
-
----
-
-### 7. Push and Open PR
-
-* Push current branch
-* Open PR to default branch
-
-Include in PR:
-
-* summary of changes
-* which validations were executed (and which were skipped)
-
----
-
-## Failure Handling
-
-* If a command fails → report and stop
-* If something is missing → skip, do not fail
-* Never hide errors
-
----
-
-## Output
-
-Always report:
-
-* files changed
-* detected scripts
-* validations executed vs skipped
-* commit message
-* PR status
+11. Create a pull request to the main branch
