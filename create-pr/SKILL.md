@@ -1,284 +1,136 @@
 ---
+
 name: create-pr
-description: Safely prepare and publish local changes with full validation. Use when the user asks to review uncommitted changes, run lint/tests/build, update changelog, apply semantic versioning, create a conventional commit, push, and open a PR. Adapt dynamically to the project stack and available scripts without hardcoding commands.
----
+description: Analyze repository changes, discover available scripts (lint, test, build), validate if possible, then commit, push and open a PR. Use when the user wants to safely publish code.
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 # Create PR
 
-## Purpose
+## Quick Start
 
-Standardize the process of finalizing and publishing code changes with high quality and safety.
-
-This skill ensures the agent:
-
-* fully understands all uncommitted changes;
-* validates code through lint, tests, and build;
-* maintains proper versioning and changelog;
-* creates clear, traceable commits;
-* safely publishes changes via push and pull request.
+Understand changes → discover available validations → run what exists → commit → push → open PR.
 
 ---
 
-## Core Responsibilities (Strict)
+## When to Use
 
-The agent MUST:
+Use when the user asks to:
 
-1. **Map all uncommitted changes**
-
-   * Identify every modified, added, and deleted file
-   * Understand the intent and impact of the changes
-
-2. **Validate implementation quality**
-
-   * Run lint, tests, and build (in strict order)
-   * Stop immediately on critical failure
-
-3. **Understand repository context**
-
-   * Detect stack, tooling, scripts, and workflows
-   * Avoid assumptions or hardcoded commands
-
-4. **Maintain versioning and changelog**
-
-   * Update `CHANGELOG.md` (if present)
-   * Increment version using semantic versioning
-   * Sync version in `package.json` (if applicable)
-
-5. **Publish changes**
-
-   * Create a conventional commit
-   * Push branch safely
-   * Open a PR targeting the correct base branch
+* commit changes
+* open a PR
+* publish code
+* validate before committing
 
 ---
 
-## Why This Matters
+## Execution Rules
 
-This workflow reduces regressions and ensures consistency by enforcing:
-
-* zero-assumption execution across different stacks;
-* mandatory validation before publishing;
-* high-quality commit history;
-* predictable and reproducible delivery for teams and agents.
-
----
-
-## Operational Principles
-
-* **Safety First** → Never skip validation without explicit instruction
-* **Fail Fast** → Stop on the first critical failure
-* **Adaptability** → Detect tools dynamically, never hardcode
-* **Transparency** → Always report what was executed and results
-* **Non-destructive Behavior** → Never force push, version bump, or PR without justification
+* Always discover available tools before executing anything
+* Never assume scripts or commands
+* Only run what actually exists
+* Missing scripts are NOT errors
+* Stop only on real execution failures
+* Prefer incremental execution if the environment is unstable
 
 ---
 
-## Mandatory Workflow
+## Workflow
 
-### 1. Inspect Repository State
+### 1. Inspect Changes
 
-Run:
-
-* `git rev-parse --is-inside-work-tree`
-* `git status --short`
-* `git diff --name-only`
-
-Goals:
-
-* confirm this is a git repository;
-* list all changed files;
-* understand the full scope before taking action.
+* Analyze current git state
+* Identify all modified, added and deleted files
+* Understand the scope before acting
 
 ---
 
-### 2. Detect Stack and Tooling
-
-Dynamically detect package manager and commands.
-
-#### JS/TS priority order:
-
-1. `pnpm-lock.yaml` → use `pnpm`
-2. `yarn.lock` → use `yarn`
-3. `bun.lockb` or `bun.lock` → use `bun`
-4. `package.json` → use `npm`
+### 2. Discover Project Capabilities
 
 If `package.json` exists:
 
-* read available `scripts`;
-* ONLY execute scripts that actually exist.
+* Read `scripts`
+* Detect if there are scripts related to:
 
-#### Fallback strategies:
+  * lint (e.g. lint, lint:fix, check)
+  * tests (e.g. test, test:ci, test:unit)
+  * build (e.g. build, compile, typecheck)
 
-* If `Makefile` exists → use targets like `lint`, `test`, `build`
-* Otherwise detect ecosystem:
+If no `package.json`:
 
-  * Python → `pytest`
-  * Go → `go test`
-  * Rust → `cargo test`
-
----
-
-### 3. Run Quality Gates (Strict Order)
-
-Execute in this exact order:
-
-1. **Lint**
-2. **Tests**
-3. **Build**
-
-#### Rules:
-
-* Stop immediately on failure
-* Do NOT continue if any critical step fails
-* Do NOT mask or ignore failures
-
-#### Script priority (if `package.json` exists):
-
-**Lint**
-
-1. `lint:fix`
-2. `lint`
-3. `check`
-
-**Tests**
-
-1. `test`
-2. `test:ci`
-3. `test:unit`
-
-**Build**
-
-1. `build`
-2. `compile`
-3. `typecheck`
+* Try to infer tooling from project structure (Makefile, language, etc.)
 
 ---
 
-### 4. Update Changelog
+### 3. Run Available Validations
 
-If `CHANGELOG.md` exists:
+* If lint script exists → run it
+* If test script exists → run it
+* If build script exists → run it
 
-* Add a new entry describing the change
-* Keep it concise and meaningful
+Rules:
 
-Include:
-
-* what changed;
-* why it changed;
-* technical or functional impact;
-* breaking changes (if any).
-
----
-
-### 5. Apply Semantic Versioning
-
-Always update version when publishing changes.
-
-#### Rules:
-
-* `patch` → bug fixes (no breaking changes)
-* `minor` → new backward-compatible features
-* `major` → breaking changes
-
-#### Required actions:
-
-* Update version in:
-
-  * `package.json` (if present)
-  * any other version source if applicable
-
-If unsure → ask for confirmation before proceeding.
+* Execute only what was discovered
+* Skip silently if not available
+* Stop on real failures
+* Never fail due to missing scripts
 
 ---
 
-### 6. Prepare Commit
+### 4. Update Changelog (if present)
 
-Run:
+* Detect if `CHANGELOG.md` exists
+* If yes, add a concise entry describing the change
 
-* `git add -A`
+---
 
-Create a **conventional commit**:
+### 5. Versioning (if applicable)
+
+* If project uses versioning (e.g. `package.json`):
+
+  * determine correct semver bump (patch, minor, major)
+* If uncertain → ask before applying
+
+---
+
+### 6. Commit
+
+* Stage all changes
+* Generate a conventional commit message based on actual changes
 
 Format:
 
-```
+```id="x8k1qz"
 type(scope): summary
 ```
 
-Common types:
-
-* `feat`, `fix`, `chore`, `refactor`, `test`, `docs`, `perf`, `ci`
-
-#### Rules:
-
-* message must reflect actual changes;
-* be concise but specific;
-* align with modified files.
-
 ---
 
-### 7. Publish Changes
+### 7. Push and Open PR
 
-#### Push
+* Push current branch
+* Open PR to default branch
 
-* Push current branch to `origin`
-* Set upstream if needed
+Include in PR:
 
-#### Pull Request
-
-* Open PR to correct base branch (`main`, `develop`, etc.)
-* Title = commit summary
-* Description must include:
-
-  * summary of changes
-  * validation results (lint/tests/build)
-  * potential risks
-
-If PR creation is not possible (e.g., no CLI or remote):
-
-* clearly report limitation;
-* DO NOT fake success.
+* summary of changes
+* which validations were executed (and which were skipped)
 
 ---
 
 ## Failure Handling
 
-On any failure, ALWAYS report:
-
-1. command executed;
-2. main error message;
-3. impact (what is blocked);
-4. recommended next step.
-
-Never hide or soften failures.
+* If a command fails → report and stop
+* If something is missing → skip, do not fail
+* Never hide errors
 
 ---
 
-## Expected Agent Output
+## Output
 
-At the end, the agent MUST report:
+Always report:
 
-* changed files scope;
-* commands executed;
-* lint/test/build results;
-* changelog update status;
-* version bump details;
-* commit message and hash;
-* push status;
-* PR status.
-
----
-
-## Completion Checklist
-
-Before finishing, ensure:
-
-* all changes reviewed;
-* lint passed (or explicitly skipped);
-* tests passed (or explicitly skipped);
-* build passed (or explicitly skipped);
-* changelog updated (if applicable);
-* version updated correctly;
-* commit created;
-* push executed (or justified);
-* PR created (or justified).
+* files changed
+* detected scripts
+* validations executed vs skipped
+* commit message
+* PR status
