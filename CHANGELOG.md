@@ -9,6 +9,7 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ### Added
 - Changelog structure created to track future project updates.
+- Root `README.md` added with repository overview and guidelines for adding new skills.
 
 ## [0.1.0] - 2026-04-16
 
