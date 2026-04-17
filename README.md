@@ -14,6 +14,7 @@ The goal is to keep each skill documented, easy to install, and easy to evolve o
 ## Current Skills
 
 - `create-pr` - Safely validates, commits, and publishes local changes with a pull request flow.
+- `backend` - Enforces Clean Architecture with DDD-inspired modeling for NestJS backends.
 
 ## Repository Structure
 
