@@ -7,6 +7,11 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ## [Unreleased]
 
+## [0.2.3] - 2026-06-01
+
+### Changed
+- `create-pr` skill: clarified the changelog step to instruct briefly documenting changes in the `CHANGELOG.md` file.
+
 ## [0.2.2] - 2026-04-20
 
 ### Changed

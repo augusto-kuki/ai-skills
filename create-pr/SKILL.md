@@ -17,7 +17,7 @@ Steps:
    * if current branch is not `develop`, stop and ask the user how to proceed before any checkout
    * only switch branches after explicit user confirmation
 
-3. Update or create `CHANGELOG.md` documenting the changes.
+3. Update or create the `CHANGELOG.md` file, briefly documenting the changes.
 
 4. Detect project package manager and scripts:
 
