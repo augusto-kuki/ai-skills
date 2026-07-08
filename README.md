@@ -13,7 +13,7 @@ The goal is to keep each skill documented, easy to install, and easy to evolve o
 
 ## Current Skills
 
-- `create-pr` - Safely validates, commits, and publishes local changes with a pull request flow.
+- `pr` - Safely validates, commits, and publishes local changes with a pull request flow, auto-linking related issues and updating an existing open PR instead of duplicating it.
 - `clean-architecture-ddd-nestjs` - Enforces Clean Architecture with DDD-inspired modeling for NestJS backends.
 
 ## Repository Structure
@@ -31,7 +31,7 @@ Each skill should live in its own folder, for example:
 Example:
 
 ```bash
-npx skills add github:augusto-kuki/ai-skills --skill create-pr
+npx skills add github:augusto-kuki/ai-skills --skill pr
 ```
 
 ## Adding a New Skill
