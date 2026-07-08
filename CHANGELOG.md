@@ -7,6 +7,12 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-07-08
+
+### Changed
+- Renamed the `create-pr` skill to `pr`; updated root `README.md` skill list and install command to match.
+- `pr` skill: added automatic linking of related GitHub issues/PRDs (referenced in the commit body and with `Closes`/`Fixes`/`Resolves` keywords in the PR body so they close on merge), and logic to update an existing open PR instead of creating a duplicate.
+
 ## [0.2.3] - 2026-06-01
 
 ### Changed
